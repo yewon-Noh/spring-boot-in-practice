@@ -6,11 +6,12 @@ spring:
     password: 1234
 
   jpa:
+    hibernate:
+      ddl-auto: create
+
     properties:
       hibernate:
         show_sql: true
         format_sql: true
-        hbm2ddl:
-          auto: create
 
     database-platform: org.hibernate.dialect.MySQLDialect
