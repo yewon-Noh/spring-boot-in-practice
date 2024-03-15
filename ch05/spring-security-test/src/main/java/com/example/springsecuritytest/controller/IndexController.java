@@ -14,8 +14,8 @@ public class IndexController {
     @GetMapping("/admin")
     public String admin() { return "admin page"; }
 
-//    @GetMapping("/logout")
-//    public String logout() {
-//        return "logout";
-//    }
+    @GetMapping("/logout")
+    public String logout() {
+        return "logout";
+    }
 }

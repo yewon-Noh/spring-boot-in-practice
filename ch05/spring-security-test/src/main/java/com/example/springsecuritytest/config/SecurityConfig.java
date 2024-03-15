@@ -1,5 +1,6 @@
 package com.example.springsecuritytest.config;
 
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,19 +8,26 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Collections;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive.*;
 
 @Configuration
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final CustomUserDetailService userDetailsService;
+
+    private static final ClearSiteDataHeaderWriter.Directive[] SOURCE = {CACHE, COOKIES, STORAGE, EXECUTION_CONTEXTS};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -31,7 +39,18 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())
-//                .logout(withDefaults())
+                .logout((logout) -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/login")
+                        .addLogoutHandler(((request, response, authentication) -> {
+                            for (Cookie cookie : request.getCookies()) {
+                                String cookieName = cookie.getName();
+                                Cookie cookieToDelete = new Cookie(cookieName, null);
+                                cookieToDelete.setMaxAge(0);
+                                response.addCookie(cookieToDelete);
+                            }
+                        }))
+                )
         ;
         return http.build();
     }
