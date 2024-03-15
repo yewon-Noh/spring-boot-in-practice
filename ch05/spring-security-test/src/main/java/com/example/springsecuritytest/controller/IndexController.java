@@ -1,6 +1,5 @@
 package com.example.springsecuritytest.controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,4 +10,12 @@ public class IndexController {
     public String index() {
         return "index page";
     }
+
+    @GetMapping("/admin")
+    public String admin() { return "admin page"; }
+
+//    @GetMapping("/logout")
+//    public String logout() {
+//        return "logout";
+//    }
 }
